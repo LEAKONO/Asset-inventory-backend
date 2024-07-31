@@ -13,6 +13,7 @@ werkzeug = "==2.2.2"
 python-dotenv = "==1.0.0"
 flask-migrate = "==4.0.4"
 sqlalchemy = "==1.4.47"
+flask-cors = "*"
 
 [dev-packages]
 
