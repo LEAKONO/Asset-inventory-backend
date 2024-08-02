@@ -65,6 +65,13 @@ def delete_asset(asset_id):
     db.session.commit()
     return jsonify({'message': 'Asset deleted successfully'})
 
+# Get all assets
+@bp.route('/assets', methods=['GET'])
+@jwt_required()
+def get_all_assets():
+    assets = Asset.query.all()
+    return jsonify(asset_schema.dump(assets, many=True))
+
 # Allocate an asset to a user
 @bp.route('/assets/<int:asset_id>/allocate', methods=['POST'])
 @jwt_required()
