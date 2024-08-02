@@ -4,19 +4,23 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from config import Config
-from models import db  
+from models import db
 from auth import auth
 from routes import bp as api_bp
 
+# Initialize Flask application
 app = Flask(__name__)
 app.config.from_object(Config)
-CORS(app) 
-db.init_app(app)  
+
+# Initialize extensions
+CORS(app)
+db.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
 
+# Register blueprints
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(api_bp, url_prefix='/api')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

@@ -23,7 +23,7 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 class Asset(db.Model):
-    __tablename__ = 'assets'  # Explicit table name
+    __tablename__ = 'assets'  
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200))
