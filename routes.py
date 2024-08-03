@@ -5,7 +5,7 @@ from schemas import UserSchema, AssetSchema, RequestSchema
 from decorators import role_required
 from marshmallow import ValidationError
 
-bp = Blueprint('api', __name__)
+bp = Blueprint('inventory', __name__)
 user_schema = UserSchema()
 asset_schema = AssetSchema()
 request_schema = RequestSchema()
@@ -159,3 +159,4 @@ def get_user_requests():
         'urgency': req.urgency,
         'status': req.status
     } for req in requests])
+

@@ -6,7 +6,7 @@ from flask_jwt_extended import JWTManager
 from config import Config
 from models import db
 from auth import auth
-from routes import bp as api_bp
+from routes import bp as inventory_bp  
 
 # Initialize Flask application
 app = Flask(__name__)
@@ -20,7 +20,7 @@ jwt = JWTManager(app)
 
 # Register blueprints
 app.register_blueprint(auth, url_prefix='/auth')
-app.register_blueprint(api_bp, url_prefix='/api')
+app.register_blueprint(inventory_bp, url_prefix='/inventory')  
 
 if __name__ == '__main__':
     app.run(debug=True)
