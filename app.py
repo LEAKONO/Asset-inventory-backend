@@ -11,7 +11,7 @@ from routes import bp as inventory_bp
 
 # Initialize Flask application
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://my_database_nroj_user:8wQJyARUpRxFdZ5TlaH4i5YxGgpKq7mT@dpg-cq3sk6qju9rs739k6en0-a.oregon-postgres.render.com/asset_inventory_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config.from_object(Config)
 # Initialize extensions
 CORS(app)
