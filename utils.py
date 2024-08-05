@@ -2,7 +2,7 @@
 def determine_role_from_email(email):
     email = email.lower()  
     
-    # Define role mappings
+    
     role_mappings = {
         "employee": "@gmail.com",
         "procurement_manager": "@manager.com",
