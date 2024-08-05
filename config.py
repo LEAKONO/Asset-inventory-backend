@@ -13,9 +13,6 @@ class Config:
 
     JWT_ACCESS_TOKEN_EXPIRES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 3600))
 
-    CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
-    CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY')
-    CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET')
     
-    if not all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]):
-        raise ValueError("Cloudinary credentials are not fully set")
+    
+    
