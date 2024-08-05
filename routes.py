@@ -108,14 +108,18 @@ def delete_asset(asset_id):
     db.session.delete(asset)
     db.session.commit()
     return success_response('Asset deleted successfully')
-
 @bp.route('/assets', methods=['GET'])
 @jwt_required()
 def get_all_assets():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    assets = Asset.query.paginate(page, per_page, False)
-    return success_response('Assets retrieved successfully', asset_schema.dump(assets.items, many=True))
+    try:
+        assets = Asset.query.paginate(page=page, per_page=per_page)
+        result = asset_schema.dump(assets.items, many=True)
+        return success_response('Assets retrieved successfully', result)
+    except Exception as e:
+        return error_response('Failed to retrieve assets', str(e)), 500
+
 
 @bp.route('/assets/<int:asset_id>/allocate', methods=['POST'])
 @jwt_required()
