@@ -138,30 +138,16 @@ def allocate_asset(asset_id):
 def create_request():
     current_user = get_jwt_identity()
     data = request.get_json()
-    logger.debug(f"Request data: {data}")
-    logger.debug(f"Current user: {current_user}")
-
-    try:
-        new_request = Request(
-            asset_id=data['asset_id'],
-            user_id=current_user['id'],
-            reason=data['reason'],
-            quantity=data['quantity'],
-            urgency=data['urgency']
-        )
-        db.session.add(new_request)
-        db.session.commit()
-        return success_response('Request submitted successfully', request_schema.dump(new_request))
-    except KeyError as e:
-        logger.error(f"Missing key: {e}")
-        return error_response('Missing key', str(e)), 422
-    except ValidationError as e:
-        logger.error(f"Validation error: {e.messages}")
-        return error_response('Validation error', e.messages), 422
-    except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
-        return error_response('Unexpected error', str(e)), 500
-
+    new_request = Request(
+        asset_id=data['asset_id'],
+        user_id=current_user['id'],
+        reason=data['reason'],
+        quantity=data['quantity'],
+        urgency=data['urgency']
+    )
+    db.session.add(new_request)
+    db.session.commit()
+    return success_response('Request submitted successfully', request_schema.dump(new_request))
 
 @bp.route('/requests/<int:request_id>', methods=['PATCH'])
 @jwt_required()
@@ -217,3 +203,4 @@ def get_user_requests():
         'status': req.status
     } for req in requests])
 
+#mgzi ipop txji byjp
