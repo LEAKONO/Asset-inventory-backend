@@ -12,8 +12,8 @@ class User(db.Model):
     role = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    email = db.Column(db.String(120), unique=True, nullable=True)  # Added email field
-
+    email = db.Column(db.String(120), unique=True, nullable=True)  
+   # is_approved = db.Column(db.Boolean, default=False)  
     allocated_assets = db.relationship('Asset', backref='allocated_to_user', lazy=True)
 
     def set_password(self, password):
