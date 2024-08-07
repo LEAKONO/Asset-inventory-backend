@@ -57,7 +57,8 @@ def add_asset():
         name=asset_data['name'],
         description=asset_data['description'],
         category=asset_data['category'],
-        image_url=image_url
+        image_url=image_url,
+        allocated_to=asset_data.get('allocated_to', None)  
     )
     db.session.add(new_asset)
     db.session.commit()
