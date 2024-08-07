@@ -109,15 +109,12 @@ def delete_asset(asset_id):
     db.session.delete(asset)
     db.session.commit()
     return success_response('Asset deleted successfully')
-
 @bp.route('/assets', methods=['GET'])
 @jwt_required()
 def get_all_assets():
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
     try:
-        assets = Asset.query.paginate(page=page, per_page=per_page)
-        result = asset_schema.dump(assets.items, many=True)
+        assets = Asset.query.all()
+        result = asset_schema.dump(assets, many=True)
         return success_response('Assets retrieved successfully', result)
     except Exception as e:
         logger.error(f"Failed to retrieve assets: {str(e)}")
@@ -148,7 +145,7 @@ def create_request():
         
     new_request = Request(
         asset_id=request_data['asset_id'],
-        user_id=current_user['id'],
+        user_id=current_user,
         reason=request_data['reason'],
         quantity=request_data['quantity'],
         urgency=request_data['urgency']

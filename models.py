@@ -32,7 +32,6 @@ class Asset(db.Model):
     category = db.Column(db.String(100), nullable=True)  
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-   # allocated_users= db.relationship('User', backref='asset', lazy=True)
 
 class Request(db.Model):
     __tablename__ = 'requests'  

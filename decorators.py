@@ -8,8 +8,11 @@ def role_required(*roles):
     def wrapper(fn):
         @wraps(fn)
         def decorated_view(*args, **kwargs):
+
             current_user = get_jwt_identity()
+            
             if current_user['role'] not in roles:
+
                 return jsonify({'message': 'Access forbidden: insufficient permissions'}), 403
             return fn(*args, **kwargs)
         return decorated_view
