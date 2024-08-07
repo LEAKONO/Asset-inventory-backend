@@ -20,13 +20,13 @@ def success_response(message, data=None):
     response = {'status': 'success', 'message': message}
     if data:
         response['data'] = data
-    return jsonify(response)
+    return jsonify(response), 200
 
 def error_response(message, errors=None):
     response = {'status': 'error', 'message': message}
     if errors:
         response['errors'] = errors
-    return jsonify(response)
+    return jsonify(response), 400
 
 @bp.route('/assets', methods=['POST'])
 @jwt_required()
@@ -41,7 +41,7 @@ def add_asset():
         asset_data = asset_schema.load(data)
     except ValidationError as err:
         logger.error(f"Validation error: {err.messages}")
-        return error_response('Validation error', err.messages), 400
+        return error_response('Validation error', err.messages)
 
     image_url = None
     if 'image' in request.files:
@@ -51,14 +51,14 @@ def add_asset():
             image_url = upload_response['secure_url']
         except Exception as e:
             logger.error(f"Error uploading image: {str(e)}")
-            return error_response('Image upload error'), 500
+            return error_response('Image upload error', str(e)), 500
 
     new_asset = Asset(
         name=asset_data['name'],
         description=asset_data['description'],
         category=asset_data['category'],
         image_url=image_url,
-        allocated_to=asset_data.get('allocated_to', None)  
+        allocated_to=asset_data.get('allocated_to', None)
     )
     db.session.add(new_asset)
     db.session.commit()
@@ -82,7 +82,7 @@ def update_asset(asset_id):
         asset_data = asset_schema.load(data, partial=True)
     except ValidationError as err:
         logger.error(f"Validation error: {err.messages}")
-        return error_response('Validation error', err.messages), 400
+        return error_response('Validation error', err.messages)
 
     asset = Asset.query.get_or_404(asset_id)
     for key, value in asset_data.items():
@@ -95,7 +95,7 @@ def update_asset(asset_id):
             asset.image_url = upload_response['secure_url']
         except Exception as e:
             logger.error(f"Error uploading image: {str(e)}")
-            return error_response('Image upload error'), 500
+            return error_response('Image upload error', str(e)), 500
 
     db.session.commit()
     logger.debug(f"Asset updated: {asset_schema.dump(asset)}")
@@ -109,6 +109,7 @@ def delete_asset(asset_id):
     db.session.delete(asset)
     db.session.commit()
     return success_response('Asset deleted successfully')
+
 @bp.route('/assets', methods=['GET'])
 @jwt_required()
 def get_all_assets():
@@ -119,8 +120,8 @@ def get_all_assets():
         result = asset_schema.dump(assets.items, many=True)
         return success_response('Assets retrieved successfully', result)
     except Exception as e:
+        logger.error(f"Failed to retrieve assets: {str(e)}")
         return error_response('Failed to retrieve assets', str(e)), 500
-
 
 @bp.route('/assets/<int:asset_id>/allocate', methods=['POST'])
 @jwt_required()
@@ -139,12 +140,18 @@ def allocate_asset(asset_id):
 def create_request():
     current_user = get_jwt_identity()
     data = request.get_json()
+    try:
+        request_data = request_schema.load(data)
+    except ValidationError as err:
+        logger.error(f"Validation error: {err.messages}")
+        return error_response('Validation error', err.messages)
+        
     new_request = Request(
-        asset_id=data['asset_id'],
+        asset_id=request_data['asset_id'],
         user_id=current_user['id'],
-        reason=data['reason'],
-        quantity=data['quantity'],
-        urgency=data['urgency']
+        reason=request_data['reason'],
+        quantity=request_data['quantity'],
+        urgency=request_data['urgency']
     )
     db.session.add(new_request)
     db.session.commit()
@@ -165,43 +172,18 @@ def update_request(request_id):
 @role_required('procurement_manager')
 def get_pending_requests():
     requests = Request.query.filter_by(status='Pending').all()
-    return success_response('Pending requests retrieved successfully', [{
-        'id': req.id,
-        'asset_id': req.asset_id,
-        'user_id': req.user_id,
-        'reason': req.reason,
-        'quantity': req.quantity,
-        'urgency': req.urgency,
-        'status': req.status
-    } for req in requests])
+    return success_response('Pending requests retrieved successfully', request_schema.dump(requests, many=True))
 
 @bp.route('/requests/completed', methods=['GET'])
 @jwt_required()
 @role_required('procurement_manager')
 def get_completed_requests():
     requests = Request.query.filter_by(status='approved').all()
-    return success_response('Completed requests retrieved successfully', [{
-        'id': req.id,
-        'asset_id': req.asset_id,
-        'user_id': req.user_id,
-        'reason': req.reason,
-        'quantity': req.quantity,
-        'urgency': req.urgency,
-        'status': req.status
-    } for req in requests])
+    return success_response('Completed requests retrieved successfully', request_schema.dump(requests, many=True))
 
 @bp.route('/user/requests', methods=['GET'])
 @jwt_required()
 def get_user_requests():
     current_user = get_jwt_identity()
     requests = Request.query.filter_by(user_id=current_user['id']).all()
-    return success_response('User requests retrieved successfully', [{
-        'id': req.id,
-        'asset_id': req.asset_id,
-        'reason': req.reason,
-        'quantity': req.quantity,
-        'urgency': req.urgency,
-        'status': req.status
-    } for req in requests])
-
-#mgzi ipop txji byjp
+    return success_response('User requests retrieved successfully', request_schema.dump(requests, many=True))
