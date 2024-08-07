@@ -145,7 +145,7 @@ def create_request():
         
     new_request = Request(
         asset_id=request_data['asset_id'],
-        user_id=current_user,
+        user_id=current_user['id'],
         reason=request_data['reason'],
         quantity=request_data['quantity'],
         urgency=request_data['urgency']
