@@ -14,7 +14,7 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     email = db.Column(db.String(120), unique=True, nullable=True)  
    # is_approved = db.Column(db.Boolean, default=False)  
-    allocated_assets = db.relationship('Asset', backref='allocated_to_user', lazy=True)
+    allocated_assets = db.relationship('Asset', backref='user', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -28,10 +28,11 @@ class Asset(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200))
     image_url = db.Column(db.String(255))
-    allocated_to = db.Column(db.Integer, db.ForeignKey('users.id'))  
+    allocated_to = db.Column(db.Integer, db.ForeignKey('users.id'),nullable=True)  
     category = db.Column(db.String(100), nullable=True)  
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+   # allocated_users= db.relationship('User', backref='asset', lazy=True)
 
 class Request(db.Model):
     __tablename__ = 'requests'  

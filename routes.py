@@ -58,7 +58,7 @@ def add_asset():
         description=asset_data['description'],
         category=asset_data['category'],
         image_url=image_url,
-        allocated_to=asset_data.get('allocated_to', None)
+        #allocated_to=asset_data.get('allocated_to', None)
     )
     db.session.add(new_asset)
     db.session.commit()
@@ -122,17 +122,27 @@ def get_all_assets():
     except Exception as e:
         logger.error(f"Failed to retrieve assets: {str(e)}")
         return error_response('Failed to retrieve assets', str(e)), 500
-
 @bp.route('/assets/<int:asset_id>/allocate', methods=['POST'])
 @jwt_required()
 @role_required('procurement_manager')
 def allocate_asset(asset_id):
-    data = request.get_json()
+    user_id = request.form.get('user_id')
+    
+    if not user_id:
+        return jsonify({'msg': 'user_id is required'}), 400
+
+    
     asset = Asset.query.get_or_404(asset_id)
-    user = User.query.get_or_404(data['user_id'])
+    
+    
+    user = User.query.get_or_404(user_id)
+    
     asset.allocated_to = user.id
+    
     db.session.commit()
-    return success_response('Asset allocated successfully')
+    
+    return jsonify({'msg': 'Asset allocated successfully'}), 200
+
 
 @bp.route('/requests', methods=['POST'])
 @jwt_required()
