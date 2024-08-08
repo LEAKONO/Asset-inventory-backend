@@ -188,3 +188,13 @@ def get_user_requests():
     current_user = get_jwt_identity()
     requests = Request.query.filter_by(user_id=current_user['id']).all()
     return success_response('User requests retrieved successfully', request_schema.dump(requests, many=True))
+@bp.route('/users', methods=['GET'])
+@jwt_required()
+@role_required('admin', 'procurement_manager')
+def get_users():
+    try:
+        users = User.query.all()
+        return success_response('Users retrieved successfully', user_schema.dump(users, many=True))
+    except Exception as e:
+        logger.error(f"Failed to retrieve users: {str(e)}")
+        return error_response('Failed to retrieve users', str(e)), 500
