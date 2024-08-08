@@ -100,15 +100,19 @@ def update_asset(asset_id):
     db.session.commit()
     logger.debug(f"Asset updated: {asset_schema.dump(asset)}")
     return success_response('Asset updated successfully', asset_schema.dump(asset))
-
 @bp.route('/assets/<int:asset_id>', methods=['DELETE'])
 @jwt_required()
 @role_required('admin', 'procurement_manager')
 def delete_asset(asset_id):
     asset = Asset.query.get_or_404(asset_id)
+    
+    # Manually delete or update related requests
+    Request.query.filter_by(asset_id=asset_id).delete()
+
     db.session.delete(asset)
     db.session.commit()
-    return success_response('Asset deleted successfully')
+    return success_response('Asset and related requests deleted successfully')
+
 @bp.route('/assets', methods=['GET'])
 @jwt_required()
 def get_all_assets():
