@@ -127,14 +127,19 @@ def get_all_assets():
 @jwt_required()
 @role_required('procurement_manager')
 def allocate_asset(asset_id):
-    user_id = request.form.get('user_id')
+    data = request.get_json()  
+    user_id = data.get('user_id')  
     if not user_id:
         return jsonify({'msg': 'user_id is required'}), 400
+
     asset = Asset.query.get_or_404(asset_id)
     user = User.query.get_or_404(user_id)
-    #asset.allocated_to = user.id
+
+    asset.allocated_to = user.id
     db.session.commit()
+
     return jsonify({'msg': 'Asset allocated successfully'}), 200
+
 @bp.route('/requests', methods=['POST'])
 @jwt_required()
 @role_required('employee')
