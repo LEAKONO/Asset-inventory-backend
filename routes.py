@@ -203,12 +203,3 @@ def get_users():
     except Exception as e:
         logger.error(f"Failed to retrieve users: {str(e)}")
         return error_response('Failed to retrieve users', str(e)), 500
-@bp.route('/assets/<int:asset_id>/allocation', methods=['GET'])
-@jwt_required()
-@role_required('admin', 'procurement_manager')
-def get_asset_allocation(asset_id):
-    asset = Asset.query.get_or_404(asset_id)
-    
-    asset_with_employee = asset_schema.dump(asset)
-    
-    return success_response('Asset and allocation details retrieved successfully', asset_with_employee)
